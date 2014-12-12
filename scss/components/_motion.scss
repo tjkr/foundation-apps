@@ -397,8 +397,8 @@ $motion-delay-long: 700ms !default;
   .hingeOutFromMiddleY { @include hinge($dir: out, $from: right, $axis: center); }
 
   // Scale
-  .zoomIn  { @include scale(in,  1.5, 1); }
-  .zoomOut { @include scale(out, 0.5, 1); }
+  .zoomIn  { @include scale(in,  0.5, 1); }
+  .zoomOut { @include scale(out, 1, 1.5); }
 
   // Spin
   .spinIn     { @include spin(in, 0.75turn); }
