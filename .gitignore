@@ -1,4 +1,5 @@
 /app
+*.tgz
 *.DS_Store
 *.coffee
 /css/*
