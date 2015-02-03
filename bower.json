@@ -2,8 +2,8 @@
   "name": "foundation-apps",
   "version": "1.0.2",
   "main": [
-    "scss/foundation.scss",
-    "js/angular/app.js"
+    "dist/css/foundation-apps.css",
+    "dist/js/foundation-apps.js"
   ],
   "dependencies": {
     "viewport-units-buggyfill": "~0.4.1",
