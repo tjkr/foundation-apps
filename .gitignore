@@ -7,5 +7,6 @@ bower_components/*
 node_modules/
 npm-debug.log
 .sass-cache/
-/build/*
+/build/**
 /tests/unit/scss/*.css
+/dist/**
