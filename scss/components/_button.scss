@@ -14,7 +14,7 @@ $button-sizes: (
 ) !default;
 $button-font-size: 0.9rem !default;
 $button-opacity-disabled: 0.5 !default;
-$button-tag-selector: true !default;
+$button-tag-selector: false !default;
 ///
 
 %button {
@@ -70,11 +70,13 @@ $button-tag-selector: true !default;
 @mixin button-expand($expand: true) {
   @if $expand {
     display: block;
+    width: 100%;
     margin-left: 0;
     margin-right: 0;
   }
   @else {
     display: inline-block;
+    width: auto;
     margin: $button-margin;
   }
 }
@@ -94,9 +96,6 @@ $button-tag-selector: true !default;
       background: transparent;
       color: scale-color($background, $lightness: 25%);
     }
-    &[data-popup-toggle]::after {
-      border-top-color: $background;
-    }
   }
   // Solid is the default
   @else {
@@ -110,9 +109,6 @@ $button-tag-selector: true !default;
     &:hover, &:focus {
       background: scale-color($background, $lightness: -15%);
       color: $color;
-    }
-    &[data-popup-toggle]::after {
-      border-top-color: $color;
     }
   }
 
@@ -141,6 +137,7 @@ $button-tag-selector: true !default;
 }
 @mixin button-disabled() {
   opacity: $button-opacity-disabled;
+  cursor: default;
   pointer-events: none;
 }
 @mixin button(
@@ -183,19 +180,12 @@ $button-tag-selector: true !default;
       }
     }
 
-    &.disabled { @include button-disabled;
-      &.secondary { @include button-disabled; }
-      &.success   { @include button-disabled; }
-      &.warning   { @include button-disabled; }
-      &.alert     { @include button-disabled; }
-      &.info      { @include button-disabled; }
-      &.dark      { @include button-disabled; }
-    }
+    &.disabled { @include button-disabled; }
   }
 
-  // @if $button-tag-selector {
-  //   button {
-  //     @extend .button;
-  //   }
-  // }
+  @if $button-tag-selector {
+    button {
+      @extend .button;
+    }
+  }
 }

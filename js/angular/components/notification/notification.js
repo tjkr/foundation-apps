@@ -8,7 +8,38 @@
     .directive('zfNotificationStatic', zfNotificationStatic)
     .directive('zfNotify', zfNotify)
     .factory('NotificationFactory', NotificationFactory)
+    .service('FoundationNotification', FoundationNotification)
   ;
+
+  FoundationNotification.$inject = ['FoundationApi', 'NotificationFactory'];
+
+  function FoundationNotification(foundationApi, NotificationFactory) {
+    var service    = {};
+
+    service.activate = activate;
+    service.deactivate = deactivate;
+
+    return service;
+
+    //target should be element ID
+    function activate(target) {
+      foundationApi.publish(target, 'show');
+    }
+
+    //target should be element ID
+    function deactivate(target) {
+      foundationApi.publish(target, 'hide');
+    }
+
+    function toggle(target) {
+      foundationApi.publish(target, 'toggle');
+    }
+
+    function createNotificationSet(config) {
+      return new NotificationFactory(config);
+    }
+  }
+
 
   ZfNotificationController.$inject = ['$scope', 'FoundationApi'];
 
@@ -46,13 +77,17 @@
       templateUrl: 'components/notification/notification-set.html',
       controller: 'ZfNotificationController',
       replace: true,
+      scope: {
+        position: '@'
+      },
       link: link
     };
 
     return directive;
 
     function link(scope, element, attrs, controller) {
-      scope.position = attrs.position ? attrs.position.split(' ').join('-') : 'top-right';
+      scope.position = scope.position ? scope.position.split(' ').join('-') : 'top-right';
+
       foundationApi.subscribe(attrs.id, function(msg) {
         if(msg === 'clearall') {
           controller.clearAll();
@@ -82,7 +117,8 @@
         content: '=?',
         image: '=?',
         notifId: '=',
-        color: '=?'
+        color: '=?',
+        autoclose: '=?'
       },
       compile: compile
     };
@@ -102,7 +138,6 @@
 
       function postLink(scope, element, attrs, controller) {
         scope.active = false;
-
         var animationIn  = attrs.animationIn || 'fadeIn';
         var animationOut = attrs.animationOut || 'fadeOut';
         var hammerElem;
@@ -121,6 +156,13 @@
           }, 50);
         };
 
+        // close if autoclose
+        if (scope.autoclose && scope.active) {
+          setTimeout(function() {
+            scope.hide();
+          }, parseInt(scope.autoclose));
+        };
+
         // close on swipe
         if (Hammer) {
           hammerElem = new Hammer(element[0]);
@@ -133,7 +175,9 @@
         }
 
         hammerElem.on('swipe', function() {
-          scope.hide();
+          if (scope.active) {
+            scope.hide();
+          }
         });
       }
     }
@@ -151,7 +195,8 @@
         title: '@?',
         content: '@?',
         image: '@?',
-        color: '@?'
+        color: '@?',
+        autoclose: '@?'
       },
       compile: compile
     };
@@ -180,10 +225,22 @@
         foundationApi.subscribe(attrs.id, function(msg) {
           if(msg == 'show' || msg == 'open') {
             scope.show();
+            // close if autoclose
+            if (scope.autoclose) {
+              setTimeout(function() {
+                scope.hide();
+              }, parseInt(scope.autoclose));
+            };
           } else if (msg == 'close' || msg == 'hide') {
             scope.hide();
           } else if (msg == 'toggle') {
             scope.toggle();
+            // close if autoclose
+            if (scope.autoclose) {
+              setTimeout(function() {
+                scope.toggle();
+              }, parseInt(scope.autoclose));
+            };
           }
 
           foundationApi.animate(element, scope.active, animationIn, animationOut);
@@ -222,9 +279,9 @@
       scope: {
         title: '@?',
         content: '@?',
-        position: '@?',
         color: '@?',
-        image: '@?'
+        image: '@?',
+        autoclose: '@?'
       },
       link: link
     };
@@ -236,9 +293,9 @@
         foundationApi.publish(attrs.zfNotify, {
           title: scope.title,
           content: scope.content,
-          position: scope.position,
           color: scope.color,
-          image: scope.image
+          image: scope.image,
+          autoclose: scope.autoclose
         });
         e.preventDefault();
       });
